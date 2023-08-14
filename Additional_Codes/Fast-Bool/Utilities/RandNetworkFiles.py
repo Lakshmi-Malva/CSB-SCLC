@@ -16,6 +16,8 @@ def GenRandNetworks(num,network):
 	from math import log
 	import random
 	import os
+	#os.urandom(size) produces a string of size size, haha.
+	#using a string as a seed?
 	random.seed(os.urandom(10)) #Wonderful Random seed. The best in business
 
 	try:
@@ -24,10 +26,11 @@ def GenRandNetworks(num,network):
 		pass
 
 	for i in range(0,num+1): #Generating 100 Random Networks
-		R_new = [] #For each new network SToring the nodes in R_new
+		R_new = [] #For each new network Storing the nodes in R_new
+		#R_new is initially R na?
 		for j in range(len(R)):
 			R_new.append([R[j][0], R[j][1], R[j][2]]) #Storing the old one for modification
-		N = int(floor(log(1e7)*len(R_new) / 2)) #I don't why this. BUt seems a good value
+		N = int(floor(log(1e7)*len(R_new) / 2)) #I don't why this. But seems a good value
 		for j in range(N):
 			edge1 = int(floor(random.randint(0, len(R_new) - 1))) #Random edge
 			edge2 = edge1
@@ -36,6 +39,7 @@ def GenRandNetworks(num,network):
 			target1 = R_new[edge1][1]
 			target2 = R_new[edge2][1]
 			R_new[edge1][1] = target2 #Shifting the target nodes of the edges
+			#I don't get it???
 			R_new[edge2][1] = target1
 
 		if i == 0: #For i = 0, we are writing the wild type to the file
@@ -46,9 +50,10 @@ def GenRandNetworks(num,network):
 		else:
 			with open('inputfiles/' + network + '_' + str(i) +'.topo', 'w') as f:
 				f.write('Source\tTarget\tType\n')
+				#but till j=len(R) is just R?
 				for j in range(len(R_new)):
 					f.write(R_new[j][0] + '\t' + R_new[j][1] + '\t' + R_new[j][2] + '\n')
-
+		#I mean, there's a better way.
 		if i == 0:
 			with open(network + '.ids', 'r') as f, open('inputfiles/' + network + '.ids', 'w') as g:
 				for line in f:
