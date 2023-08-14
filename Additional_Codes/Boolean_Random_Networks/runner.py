@@ -20,12 +20,14 @@ redundant = ['ATF2','CBFA2T2','CEBPD','ELF3','FLI1','KDM5B','OVOL2','PAX5','PBX1
 ting = [i for i in nodes if i not in tada]
 top = tada+ting
 
+#Should I uncomment this??
 #GenRandNetworks(1000,network)
 print("All the Random networks are generated")
 
 if not os.path.exists("OUTPUT"):
     os.mkdir("OUTPUT")
 
+#what same states??
 f = open(os.path.join("OUTPUT",'jsd.txt'),'w')
 f.write("Run" + "\t" + "Num W" + "\t" + "Num R" + "\t" + "JSD" + "\t" + "Same states" + "\n")
 f.close()
@@ -38,8 +40,10 @@ f = open(os.path.join("OUTPUT",'influ.txt'),'w')
 f.write("Run" + "\t" + "Influ W" + "\t" + "Influ R" + "\t" + "Same matrix" + "\n")
 f.close()
 
+#https://www.w3schools.com/python/pandas/pandas_dataframes.asp
 J_vals = pd.DataFrame(index = np.arange(1001), columns = np.arange(1000))
 
+#get the arguments.
 wild_type = "Output" + "_" + network
 bool.main(network,wild_type)
 numb = corre(wild_type,wild_type,top,nodes,0,0)
