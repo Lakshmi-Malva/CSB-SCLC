@@ -45,6 +45,7 @@ def Dynamics(IniVector,inter_mat,steps,values,fixed_state,turn_state,networkx,pl
     if plot_nodes:
         state_vect1 = np.transpose(state_vect)
         state_vect1[state_vect1<0] = 0 #Replacing all -1s with 0
+        #what are plot_nodes and PlotNodes?
         for i,node in enumerate(plot_nodes):
             PlotNodes[i] = [x+y for x,y in zip(PlotNodes[i],state_vect1[node])]
 
