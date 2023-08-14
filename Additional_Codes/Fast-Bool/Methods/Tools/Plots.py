@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 
+#What are the results here??
 def plot_result(results,plotnodes,folder,marker=True):
     current_dir = os.getcwd() #current working directory
     path = current_dir + "/OUTPUT/" + folder
@@ -36,6 +37,7 @@ def plot_result(results,plotnodes,folder,marker=True):
     #plt.show()  # show plot
     return
 
+#Makes the network.
 def Plot_network(file):
     current_dir = os.getcwd() #current working directory
     path = current_dir +"/" #+ "/inputfiles/"
