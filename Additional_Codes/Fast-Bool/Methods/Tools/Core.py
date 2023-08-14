@@ -7,7 +7,8 @@ def AttractorAnalysis(nodes,StateTraj,inter_mat,folder):
     '''Identifying attractors using NetworkX and writes them to a file'''
 
     import networkx as nx
-
+    # What is StateTraj initially?? type(StateTraj)?
+    # Assuming traj.f stores the nodes and edges of the present network? or the phase diagram?
     for traj in load_data('traj.f'):
         StateTraj.add_edges_from(traj)
     attractors = list(nx.attracting_components(StateTraj))
@@ -18,13 +19,14 @@ def AttractorAnalysis(nodes,StateTraj,inter_mat,folder):
         os.makedirs(path) #If folder doesn't exist then create it
     except:
         pass
-
+    #Typesetting for marking the stable states.
     import xlsxwriter as xlsxwt
     workbook = xlsxwt.Workbook(os.path.join('OUTPUT',folder,'NetworkX_Sync.xls'))
     worksheet = workbook.add_worksheet("stable_states")
     cell_format = workbook.add_format()
     cell_format.set_bg_color('black')
 
+    #Nodes, Frustration, Frequency: Row titles
     for i, node in enumerate(nodes):
         worksheet.write(i+1, 0, node) #Writing names of the nodes
     worksheet.write(len(nodes)+2,0, 'Frustration')
@@ -41,6 +43,7 @@ def AttractorAnalysis(nodes,StateTraj,inter_mat,folder):
                 worksheet.write(0,j+1,"{} state oscillator".format(len(states)))
             j += 1
 
+    #what are node values? Like what do they hold??
     for i in range(1,len(attract_list)+1):
         state = num2vect(attract_list[i-1],len(nodes)).tolist()
         for j,node_value in enumerate(state):
@@ -54,6 +57,6 @@ def AttractorAnalysis(nodes,StateTraj,inter_mat,folder):
     worksheet.set_column(0,len(attractors)+2,15)
 
     workbook.close()
-    print("All the attractoors by Networks are found. Number of attractors found is %s" %len(attractors))
+    print("All the attractors by Networks are found. Number of attractors found is %s" %len(attractors))
     print("Saving these states in %s/NetworkX_Sync.xls\n" % folder)
 ################################################################################
