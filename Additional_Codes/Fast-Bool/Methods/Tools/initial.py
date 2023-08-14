@@ -5,6 +5,7 @@ def GetIni(index,nodes,values,ini_state,fixed_state):
 
     values = np.array(values)
     # Genearting a boolean vector of size node num
+    # the elements will be randomly chosen from the elements of values
     ini_vect = np.random.choice(values,len(nodes))
     if ini_state or fixed_state:
         for node,value in dict(list(ini_state.items()) + list(fixed_state.items())):
