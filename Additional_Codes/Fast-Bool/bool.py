@@ -18,11 +18,15 @@ random.seed(os.urandom(10))  # Best Random seed
 global NODES, INTERMAT
 
 if __name__ == '__main__':
+    #sys.argv is the list of all arguments you give in the terminal, i.e., command line, like python 'name of the file' 'other args'
+    #so sys.argv is list of 'name of the file' and 'other args'
+    #sys.argv[0] is the name of the program.
     if sys.argv[1]:
         in_file = sys.argv[1] #Either you can give the name of the file (Remember, not zero as zero means name of python file)
     else:
         in_file = 'bool.in' #Or it takes in the default file
 
+    #What do these functions do? yellinda?
     INPUT = InputParser(in_file)
     NODES, INTERMAT = ReadRules(INPUT['network'], INPUT['model'])
     IniState, FixedState, TurnState = PreDefine(INPUT, NODES)
