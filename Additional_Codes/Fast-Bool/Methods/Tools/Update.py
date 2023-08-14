@@ -9,7 +9,7 @@ def UpdateFixedState(bool_vect,fixed_state):
         return bool_vect
 
 ################################################################################
-
+#What are turn states??
 def UpdateTurnState(boolvect,time_step,turn_state,fixed_state):
     ''' Fixes nodes at the given time '''
 
