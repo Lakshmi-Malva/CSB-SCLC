@@ -26,9 +26,11 @@ if __name__ == '__main__':
     else:
         in_file = 'bool.in' #Or it takes in the default file
 
-    #What do these functions do? yellinda?
+    #takes the sim params from the input file 
     INPUT = InputParser(in_file)
+    #spits out the initial nodes and inter_mat 
     NODES, INTERMAT = ReadRules(INPUT['network'], INPUT['model'])
+    #self-explanatory
     IniState, FixedState, TurnState = PreDefine(INPUT, NODES)
 
     output_file = INPUT['network'] #Create a folder with network name
