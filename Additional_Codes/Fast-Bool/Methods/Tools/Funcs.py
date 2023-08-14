@@ -9,10 +9,19 @@ import os
 
 def num2vect(num,node_num):
     '''Converts a binary number into Vector.'''
-
+    # num is normal no.; string converts it to binary. why zfill tho?
     string = format(num, 'b').zfill(node_num)
+    #Example of fromiter:
+    #iterable = (x*x for x in range(5))
+    #np.fromiter(iterable, float)
+    #output: array([  0.,   1.,   4.,   9.,  16.])
+    #but string isn't iterable? 
+    #anyway: makes the binary no. into 1-D array: splitting
+    #i.e., 1000 = [1 0 0 0]
     arr = np.fromiter(string, dtype=int)
+    #np.where(condition, if True: do this, if False: do this)
     arr = np.where(arr <= 0, -1.0, arr)
+    #what makes this a vector?!
     return arr.astype(np.float32)
 
 def col2vect(arr,node_num):
@@ -71,6 +80,7 @@ def pickle_file(arr, file_name):
 ################################################################################################################
 @nb.jit(parallel=True, nopython = True, nogil = True, fastmath = True)
 def parallel_nonzero_count(arr):
+    #will make the multi-dim array into 1-D, flattens row wise
     flattened = arr.ravel()
     sum_ = 0
     for i in range(flattened.size):
@@ -84,17 +94,18 @@ def frust(boolvect1,inter_mat):
     # By calculating number of non-zero elements we can know number of edges in a network
     edges = parallel_nonzero_count(inter_mat)
     # transpose in Numpy produces the same mtrix for 1xn mtrix. So we use reshaping
+    #basically transpose
     boolvect2 = boolvect1.reshape((-1, 1))
     # reshape((-1,1)) means columns to rows and single column
     frust_mat = (np.multiply((np.multiply(inter_mat,boolvect2)),boolvect1))
     # Frustration for a node = sigma JijSiSj
-    result = (frust_mat < 0).sum() # Checking now many nodes are Frustrated
+    result = (frust_mat < 0).sum() # Checking how many nodes are Frustrated
 
     return result/edges # returns relative frustration
 
 def Frustration(vect,inter_mat):
     ''' Returns frustration using the njit function '''
-
+    #vect2 from vect1, no?
     vect = num2vect(vect,inter_mat.shape[0])
     num = frust(vect,inter_mat)
     return num
@@ -112,7 +123,7 @@ def highestPowerof2(n):
 class tempmap(np.memmap):
     """
     Extension of numpy memmap to automatically map to a file stored in temporary directory.
-    Usefull as a fast storage option when numpy arrays become large and
+    Useful as a fast storage option when numpy arrays become large and
     we just want to do some quick experimental stuff.
     """
     def __new__(subtype, dtype=np.uint64, mode='w+', offset=0,
