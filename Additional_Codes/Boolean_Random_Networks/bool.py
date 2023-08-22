@@ -39,4 +39,4 @@ def main(rules_file, output_file):
             INPUT, IniState,
             FixedState, TurnState,
             folder=output_file)
-        #print("All the analysis is done. Bye ;)")
+        print("All the analysis is done. Bye ;)")
