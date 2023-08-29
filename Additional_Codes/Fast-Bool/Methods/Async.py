@@ -58,7 +58,7 @@ def Dynamics(IniVector,inter_mat,steps,values,fixed_state,turn_state,networkx,pl
     else:
         return (False, False, False, PlotNodes) #If it is not a steady state don't return anything
         
-def Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
+def Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder,rand_weigh):
     ''' Runs dynamics for given number of initial conditions '''
 
     print("Preparing Simulation rules...\n")
@@ -98,19 +98,42 @@ def Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
     print("Preparing %s runs...." %2**(run_power))
     print("Fireing the runs for each initial condition. May take some time")
     index = 0 #index of run
+    current_dir = os.getcwd() #current working directory
+    path = current_dir + "/OUTPUT/" + folder
+    try: os.makedirs(path) #If folder doesn't exist then create it
+    except: pass
     for i in range(2**(run_power)):
         value = i*100/2**(run_power)
         print(" %0.4f percent complete" %value, end = '\r', flush = True)
-        jobs = []
+        jobs = []; run_index = []; initial_vector = []
+
+        if rand_weigh == True:
+            Path = path +'/'+f'init_{i}.txt'
+            file = open(Path).readlines()
+                
         for j in range(int(rounds/2**(run_power))):
-            IniVector = GetIni(index,nodes,values,IniState,FixedState)
+            if rand_weigh == False:
+                IniVector = GetIni(index,nodes,values,IniState,FixedState)
+                run_index.append(j); initial_vector.append(IniVector)
+            if rand_weigh == True:
+                line = file[j]
+                IniVector = [float(value) for value in line.split('\t')]
+                IniVector = np.array(IniVector[1:])
+
             index += 1
             jobs.append(pool.apply_async(Dynamics,args=(IniVector,inter_mat,steps,
                                             values,FixedState,TurnState,input['NetworkX'],
                                             plot_nodes,PlotNodes)))
+        
+        if rand_weigh == False:
+            datafile_path = path +'/'+f'init_{i}.txt'
+            data_init = np.column_stack([run_index,np.array(initial_vector)])
+            np.savetxt(datafile_path , data_init, delimiter = '\t',fmt = '%s')
+
         [result.wait() for result in jobs]
         for results in jobs:
             result = results.get()
+            #print(result)
             if result[0]:
                 if result[2] in SteadyState: #If steady state is already found and basin is different, then we store the basin
                     basin_dic[result[1]] = result[2]
@@ -139,11 +162,11 @@ def Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
 
     return basin_dic,SteadyState,frustration
 
-def SummaryAsync(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
+def SummaryAsync(nodes,inter_mat,input,IniState,FixedState,TurnState,folder,rand_weigh,run_num):
     ''' Summarises all the info of this Asynchronous update dynamics '''
 
     print("Summarizing the results.....\n")
-    Basins,SteadyState,frustration = Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder)
+    Basins,SteadyState,frustration = Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder,rand_weigh)
 
     current_dir = os.getcwd() #current working directory
     path = current_dir + "/OUTPUT/" + folder
@@ -154,7 +177,9 @@ def SummaryAsync(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
 
     import xlsxwriter as xlsxwt
 
-    workbook = xlsxwt.Workbook(os.path.join('OUTPUT',folder,'Summary_Async.xlsx'))
+    if rand_weigh == True: file = f'Summary_Async_weigh_{run_num}.xlsx'
+    if rand_weigh == False: file = f'Summary_Async_{run_num}.xlsx'
+    workbook = xlsxwt.Workbook(os.path.join('OUTPUT',folder,file))
     worksheet = workbook.add_worksheet("stable_states")
     cell_format = workbook.add_format()
     cell_format.set_bg_color('black')

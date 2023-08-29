@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from pathlib import Path
+from gen_ids import *
 
 ################################################################################
 def InputParser(Input_File):
@@ -87,11 +88,13 @@ def InputParser(Input_File):
     return INPUT
 
 ################################################################################
-def ReadRules(file, model):
+def ReadRules(file, model, rand_weigh):
     ''' Reads .ids and .topo file to get nodes and interactions '''
 
     current_dir = os.getcwd()  # current working directory
     path = current_dir + "/"
+    if os.path.isfile(path + file +'.ids'): pass
+    else: gen_ids_file(file)
     NODES = [
         x.split('\t')[0] for x in open(
             Path(
@@ -100,13 +103,14 @@ def ReadRules(file, model):
                 '.ids')).readlines()]  # Contains all the nodes (from .ids)
 
     NODES = sorted(NODES) #sorting the nodes alphabetically
-
-    INTERMAT = np.ascontiguousarray([[0] * len(NODES)] * len(NODES))  # Interaction matrix
-
+    
+    #INTERMAT = np.ascontiguousarray([[0] * len(NODES)] * len(NODES))  # Interaction matrix
+    INTERMAT = np.zeros((len(NODES),len(NODES)))
     Models = ['Ising', 'InhibitoryDominant',
               'ActivatoryDominant']  # All Models
     # Differnt edge weights for different models
     Edge_weights = [[1.0, -1.0], [1.0, -1000.0], [1000.0, -1.0]]
+    print(rand_weigh)
     for line in open(
         Path(
             path +
@@ -114,13 +118,17 @@ def ReadRules(file, model):
             '.topo')).readlines()[
             1:]:  # reads interactions from .topo file
         res = line.split()
-        if res[2] == '1':
-            INTERMAT[NODES.index(res[1])][NODES.index(
-                res[0])] = Edge_weights[Models.index(model)][0]
-        if res[2] == '2':
-            INTERMAT[NODES.index(res[1])][NODES.index(
-                res[0])] = Edge_weights[Models.index(model)][1]
-           
+        if rand_weigh == False:
+            if res[2] == '1':
+                INTERMAT[NODES.index(res[1])][NODES.index(res[0])] = Edge_weights[Models.index(model)][0]
+            if res[2] == '2':
+                INTERMAT[NODES.index(res[1])][NODES.index(res[0])] = Edge_weights[Models.index(model)][1]
+        if rand_weigh == True:
+            if res[2] == '1':
+                INTERMAT[NODES.index(res[1])][NODES.index(res[0])] = (Edge_weights[Models.index(model)][0])*np.random.random()
+            if res[2] == '2':
+                INTERMAT[NODES.index(res[1])][NODES.index(res[0])] = (Edge_weights[Models.index(model)][1])*np.random.random()
+      
     return NODES, INTERMAT
 
 ################################################################################

@@ -14,7 +14,7 @@ start_time = time.time()
 with open("bool.in") as f:
     network = f.readline().split('=')[1].strip()
 
-nodes,intermat = Interaction(network, 'Ising')
+nodes,intermat = Interaction(network, 'Ising',random = False)
 tada = ['ASCL1', 'ATF2', 'CBFA2T2', 'CEBPD','ELF3','ETS2','FOXA1','FOXA2','FLI1','INSM1','KDM5B','LEF1','MYB','OVOL2','PAX5','PBX1','POU3F2','SOX11', 'SOX2', 'TCF12','TCF3','TCF4','NEUROD1']
 redundant = ['ATF2','CBFA2T2','CEBPD','ELF3','FLI1','KDM5B','OVOL2','PAX5','PBX1','ZEB1','BHLHE40','ETS2','FOXA2','MITF','MYB','MYC','TCF12','TCF7L2']
 ting = [i for i in nodes if i not in tada]

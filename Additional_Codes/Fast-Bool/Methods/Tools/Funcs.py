@@ -10,6 +10,7 @@ import os
 def num2vect(num,node_num):
     '''Converts a binary number into Vector.'''
     # num is normal no.; string converts it to binary. why zfill tho?
+    #print(num)
     string = format(num, 'b').zfill(node_num)
     #Example of fromiter:
     #iterable = (x*x for x in range(5))
@@ -19,6 +20,7 @@ def num2vect(num,node_num):
     #anyway: makes the binary no. into 1-D array: splitting
     #i.e., 1000 = [1 0 0 0]
     arr = np.fromiter(string, dtype=int)
+    #arr = np.array(list(map(float,string)))
     #np.where(condition, if True: do this, if False: do this)
     arr = np.where(arr <= 0, -1.0, arr)
     #what makes this a vector?!
@@ -106,6 +108,7 @@ def frust(boolvect1,inter_mat):
 def Frustration(vect,inter_mat):
     ''' Returns frustration using the njit function '''
     #vect2 from vect1, no?
+    #print(inter_mat)
     vect = num2vect(vect,inter_mat.shape[0])
     num = frust(vect,inter_mat)
     return num

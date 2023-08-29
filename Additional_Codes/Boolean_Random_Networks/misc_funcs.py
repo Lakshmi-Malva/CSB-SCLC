@@ -8,7 +8,7 @@ import pickle
 
 ################################################################################################################
 
-def Interaction(file, model):
+def Interaction(file, model, random):
     ''' Reads .ids and .topo file to get nodes and interactions '''
 
     path = os.getcwd()  # current working directory
@@ -32,12 +32,18 @@ def Interaction(file, model):
             '.topo')).readlines()[
             1:]:  # reads interactions from .topo file
         res = line.split()
-        if res[2] == '1':
+
+        #Modified for incorporation random weights.
+        if random == False:
+            if res[2] == '1':
+                INTERMAT[NODES.index(res[1])][NODES.index(
+                    res[0])] = Edge_weights[Models.index(model)][0]
+            if res[2] == '2':
+                INTERMAT[NODES.index(res[1])][NODES.index(
+                    res[0])] = Edge_weights[Models.index(model)][1]
+        if random == True:
             INTERMAT[NODES.index(res[1])][NODES.index(
-                res[0])] = Edge_weights[Models.index(model)][0]
-        if res[2] == '2':
-            INTERMAT[NODES.index(res[1])][NODES.index(
-                res[0])] = Edge_weights[Models.index(model)][1]
+                    res[0])] = np.random.random(size=2)
 
     return NODES, INTERMAT
 

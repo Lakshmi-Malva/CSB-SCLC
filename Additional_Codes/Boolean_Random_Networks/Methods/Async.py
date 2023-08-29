@@ -57,7 +57,7 @@ def Dynamics(IniVector,inter_mat,steps,values,fixed_state,turn_state,networkx,pl
     else:
         return (False, False, False, PlotNodes) #If it is not a steady state don't return anything
 
-def Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
+def Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder,rand_weigh=False):
     ''' Runs dynamics for given number of initial conditions '''
 
     #print("Preparing Simulation rules...\n")
@@ -78,11 +78,11 @@ def Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
 
 
     if input['Parallel_Process']:
-        #print("\nParallel Process support is enabled. Number of Individual processes is %s" % input['Number_processes'])
+        print("\nParallel Process support is enabled. Number of Individual processes is %s" % input['Number_processes'])
         process = input['Number_processes']
         pool = mp.Pool(processes = process) #Creating No of processors
     else:
-        #print("\nParallel Process support is not enabled. Runs take a lot of time....")
+        print("\nParallel Process support is not enabled. Runs take a lot of time....")
         pool = mp.Pool(processes = 1) #Creating 1 process
 
     #Generating an array for Plot nodes
@@ -94,19 +94,30 @@ def Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
     else:
         PlotNodes = [] #returns an empty list when we don't need to plot
 
-    #print("Preparing %s runs...." %2**(run_power))
-    #print("Fireing the runs for each initial condition. May take some time")
+    print("Preparing %s runs...." %2**(run_power))
+    #print("Firing the runs for each initial condition. May take some time")
     index = 0 #index of run
+    current_dir = os.getcwd() #current working directory
+    path = current_dir + "/OUTPUT/" + folder
+    try: os.makedirs(path) #If folder doesn't exist then create it
+    except: pass
     for i in range(2**(run_power)):
         value = i*100/2**(run_power)
         print(i)
-        jobs = []
+        jobs = []; run_index = []; initial_vector = []
         for j in range(int(rounds/2**(run_power))):
-            IniVector = GetIni(index,nodes,values,IniState,FixedState)
+            if rand_weigh == False:
+                IniVector = GetIni(index,nodes,values,IniState,FixedState)
+                run_index.append(j); initial_vector.append(IniVector)
+            if rand_weigh == True: pass
             index += 1
             jobs.append(pool.apply_async(Dynamics,args=(IniVector,inter_mat,steps,
                                             values,FixedState,TurnState,input['NetworkX'],
                                             plot_nodes,PlotNodes)))
+        datafile_path = path +'/'+f'init_{i}.txt'
+        data_init = np.column_stack([run_index,np.array(initial_vector)])
+        np.savetxt(datafile_path , data_init, delimiter = '\t',fmt = '%s')
+
         [result.wait() for result in jobs]
         for results in jobs:
             result = results.get()
@@ -119,7 +130,7 @@ def Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
                     SteadyState[result[2]] = 1
                     frustration[result[2]] = Frustration(result[2],inter_mat)
             PlotNodes = result[3]
-
+        
     pool.close() #Very important to close the pool. Or multiple instances will be running
 
     if input['NetworkX']: #If we use networkx to analyze attractors
@@ -138,11 +149,11 @@ def Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
 
     return basin_dic,SteadyState,frustration
 
-def SummaryAsync(nodes,inter_mat,input,IniState,FixedState,TurnState,folder):
+def SummaryAsync(nodes,inter_mat,input,IniState,FixedState,TurnState,folder,rand_weigh):
     ''' Summarises all the info of this Asynchronous update dynamics '''
 
     #print("Summarizing the results.....\n")
-    Basins,SteadyState,frustration = Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder)
+    Basins,SteadyState,frustration = Simulation(nodes,inter_mat,input,IniState,FixedState,TurnState,folder,rand_weigh=rand_weigh)
 
     current_dir = os.getcwd() #current working directory
     path = current_dir + "/OUTPUT/" + folder

@@ -26,28 +26,33 @@ if __name__ == '__main__':
     else:
         in_file = 'bool.in' #Or it takes in the default file
 
-    #takes the sim params from the input file 
-    INPUT = InputParser(in_file)
-    #spits out the initial nodes and inter_mat 
-    NODES, INTERMAT = ReadRules(INPUT['network'], INPUT['model'])
-    #self-explanatory
-    IniState, FixedState, TurnState = PreDefine(INPUT, NODES)
+    Rand_weigh = [False,True]; Runs_num = 10
 
-    output_file = INPUT['network'] #Create a folder with network name
+    for run_num in range(1,Runs_num+1):
+        print(f'Run No.:{run_num}')
+        for rand_weigh in Rand_weigh:
+            #takes the sim params from the input file 
+            INPUT = InputParser(in_file)
+            #spits out the initial nodes and inter_mat 
+            NODES, INTERMAT = ReadRules(INPUT['network'], INPUT['model'],rand_weigh=rand_weigh)
+            #self-explanatory
+            IniState, FixedState, TurnState = PreDefine(INPUT, NODES)
 
-    if INPUT['mode'] == 'Sync':
-        from Methods.Sync import SummarySync
-        SummarySync(
-            NODES, INTERMAT,
-            INPUT, IniState,
-            FixedState, TurnState,
-            folder=output_file)
-        print("All the analysis is done. Bye ;)")
-    elif INPUT['mode'] == 'Async':
-        from Methods.Async import SummaryAsync
-        SummaryAsync(
-            NODES, INTERMAT,
-            INPUT, IniState,
-            FixedState, TurnState,
-            folder=output_file)
-        print("All the analysis is done. Bye ;)")
+            output_file = INPUT['network'] #Create a folder with network name
+
+            if INPUT['mode'] == 'Sync':
+                from Methods.Sync import SummarySync
+                SummarySync(
+                    NODES, INTERMAT,
+                    INPUT, IniState,
+                    FixedState, TurnState,
+                    folder=output_file,rand_weigh=rand_weigh)
+                print("All the analysis is done. Bye ;)")
+            elif INPUT['mode'] == 'Async':
+                from Methods.Async import SummaryAsync
+                SummaryAsync(
+                    NODES, INTERMAT,
+                    INPUT, IniState,
+                    FixedState, TurnState,
+                    folder=output_file,rand_weigh=rand_weigh,run_num=run_num)
+                print("All the analysis is done. Bye ;)")

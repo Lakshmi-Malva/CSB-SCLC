@@ -30,7 +30,7 @@ def main(rules_file, output_file):
             NODES, INTERMAT,
             INPUT, IniState,
             FixedState, TurnState,
-            folder=output_file)
+            folder=output_file,rand_weigh=False)
         #print("All the analysis is done. Bye ;)")
     elif INPUT['mode'] == 'Async':
         from Methods.Async import SummaryAsync
@@ -38,5 +38,5 @@ def main(rules_file, output_file):
             NODES, INTERMAT,
             INPUT, IniState,
             FixedState, TurnState,
-            folder=output_file)
+            folder=output_file,rand_weigh=False)
         print("All the analysis is done. Bye ;)")
